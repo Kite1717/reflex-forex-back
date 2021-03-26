@@ -1,6 +1,9 @@
 {
   "name": "jwt",
   "version": "1.0.0",
+  "engines": {
+    "node": "14.x"
+  },
   "description": "",
   "main": "app/server.js",
   "scripts": {
@@ -11,6 +14,7 @@
   "license": "ISC",
   "dependencies": {
     "app-root-path": "^3.0.0",
+    "axios": "^0.21.1",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
     "babel-preset-env": "^1.7.0",
@@ -25,11 +29,10 @@
     "nodemon": "^2.0.6",
     "pg": "^8.4.2",
     "pg-hstore": "^2.3.3",
-    "sequelize": "^6.3.5",
-    "sequelize-cli": "^6.2.0"
+    "sequelize": "^6.3.5"
   },
   "devDependencies": {
     "nodemon": "^2.0.4",
-    "sequelize-cli": "^5.5.1"
+    "sequelize-cli": "^6.2.0"
   }
 }
