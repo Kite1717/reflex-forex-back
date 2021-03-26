@@ -18,12 +18,9 @@ const app = express.Router();
 
 //**************Route Level 1
 
-
-
-//LOG 
+//LOG
 
 //  console.log(JSON.stringify(result,null,2))
-
 
 app.post("/create-user", async (req, res) => {
   forex.createUser(req.body).then((fores) => {
@@ -42,17 +39,36 @@ app.post("/create-user", async (req, res) => {
         return res.status(500).json(err);
       });
   });
-});//end of create user
+}); //end of create user
 
 app.put("/update-user", async (req, res) => {
-    forex.updateUser(req.body).then((fores) => {
-      let result = fores;
+  forex.updateUser(req.body).then((fores) => {
+    let result = fores;
 
-      console.log(JSON.stringify(result,null,2))
-      result.updatedAt = new Date();
-      result.creatorUserId = 1;
-  
-      db.Account.update(result,{where: {Login: result.Login}})
+    console.log(JSON.stringify(result, null, 2));
+    result.updatedAt = new Date();
+    result.creatorUserId = 1;
+
+    db.Account.update(result, { where: { Login: result.Login } })
+      .then((acc) => {
+        return res.json({
+          data: acc,
+        });
+      })
+      .catch((err) => {
+        return res.status(500).json(err);
+      });
+  });
+});
+
+app.put("/delete-user", async (req, res) => {
+  forex.deleteUser(req.body).then((fores) => {
+    if (fores) {
+      let result = {};
+      result.deletedAt = new Date();
+      result.deleterUserId = 1;
+
+      db.Account.update(result, { where: { Login: req.body.Login } })
         .then((acc) => {
           return res.json({
             data: acc,
@@ -61,51 +77,22 @@ app.put("/update-user", async (req, res) => {
         .catch((err) => {
           return res.status(500).json(err);
         });
-    });
-  });
-
-  app.put("/delete-user", async (req, res) => {
-    forex.deleteUser(req.body).then((fores) => {
-    if(fores)
-    {
-
-        let result = {}
-        result.deletedAt = new Date();
-        result.deleterUserId = 1;
-    
-        db.Account.update(result,{where: {Login: req.body.Login}})
-          .then((acc) => {
-            return res.json({
-              data: acc,
-            });
-          })
-          .catch((err) => {
-            return res.status(500).json(err);
-          });
-
+    } else {
+      return res.status(404).json({ msg: "Account not deleted" });
     }
-    else{
-        return res.status(404).json({msg : "Account not deleted"});
+  });
+});
+
+//bunu bi kontrol et ilerde  cevapda başka verilerde geliyor
+app.get("/get-user/:login", async (req, res) => {
+  forex.getUser({ Login: req.params.login }).then((fores) => {
+    if (fores.Login) {
+      return res.json({
+        data: fores,
+      });
+    } else {
+      return res.status(404).json({ msg: "Account not found" });
     }
-    });
   });
-
-
-
-  //bunu bi kontrol et ilerde  cevapda başka verilerde geliyor
-  app.get("/get-user/:login", async (req, res) => {
-        forex.getUser({Login:req.params.login}).then((fores) => {
-        if(fores.Login)
-        {
-            return res.json({
-                data: fores,
-              });
-
-        }
-        else{
-            return res.status(404).json({msg:"Account not found"});
-        }
-    
-    });
-  });
+});
 module.exports = app;
