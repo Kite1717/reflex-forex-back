@@ -28,11 +28,12 @@ app.post("/create-user", async (req, res) => {
     result.createdAt = new Date();
     result.updatedAt = new Date();
     result.creatorUserId = 1;
+    result.MainPassword = req.body.MainPassword
 
     db.Account.create(result)
       .then(async(acc) => {
 
-        await db.ULog.create({createdAt:result.createdAt,creatorUserId: result.creatorUserId,comment:"Hesap Oluşturdu"}) 
+       // await db.ULog.create({createdAt:result.createdAt,creatorUserId: result.creatorUserId,comment:"Hesap Oluşturdu"}) 
 
         return res.json({
           data: acc,
