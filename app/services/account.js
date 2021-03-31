@@ -30,7 +30,10 @@ app.post("/create-user", async (req, res) => {
     result.creatorUserId = 1;
 
     db.Account.create(result)
-      .then((acc) => {
+      .then(async(acc) => {
+
+        await db.ULog.create({createdAt:result.createdAt,creatorUserId: result.creatorUserId,comment:"Hesap Oluşturdu"}) 
+
         return res.json({
           data: acc,
         });
@@ -45,9 +48,7 @@ app.put("/update-user", async (req, res) => {
   forex.updateUser(req.body).then((fores) => {
     let result = fores;
 
-    console.log(JSON.stringify(result, null, 2));
     result.updatedAt = new Date();
-    result.creatorUserId = 1;
 
     db.Account.update(result, { where: { Login: result.Login } })
       .then((acc) => {

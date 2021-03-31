@@ -1,20 +1,20 @@
   
 const  express  =  require("express");
-const db = require( "../models");
+const db = require( "../app/models");
 const Op = db.Sequelize.Op;
 
 
 // Middlewares
-const auth = require('../middlewares/auth');
+const auth = require('../app/middlewares/auth');
 
 const fs = require('fs');
 
 
 //Roles
-const {UserRolls} = require("../helpers/enum")
+const {UserRolls} = require("../app/helpers/enum")
 
 //file uploads handler
-const upload = require("../helpers/upload")
+const upload = require("../app/helpers/upload")
 
 const app = express.Router();
 

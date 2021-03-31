@@ -3,13 +3,13 @@ const API_INFO = require("../../config/forexapi");
 
 const ROOT_URL = "https://api.launchfxm.com/api_v1/";
 
-const postfixHelper = () => {
+const postfixHelper = (MainPassword) => {
   return (
     "Group=" +
     API_INFO.Group +
     "&" +
     "MainPassword=" +
-    API_INFO.MainPassword +
+    MainPassword +
     "&" +
     "InvestPassword=" +
     API_INFO.InvestPassword +
@@ -41,7 +41,7 @@ export async function createUser(account) {
     url += info.toString() + "=" + account[info] + "&";
   }
   
-  url += postfixHelper();
+  url += postfixHelper(account.MainPassword);
 
   const {data} =  await axios.get(url);
 
@@ -153,8 +153,6 @@ export async function creditIn(account) {
 export async function creditOut(account) {
   let url = ROOT_URL + "account_creditOut?";
 
- 
-  console.log(account,"ewwwwww")
   for (let info in account) {
     url += info.toString() + "=" + account[info] + "&";
   }
@@ -163,12 +161,45 @@ export async function creditOut(account) {
 
   const{ data} =  await axios.get(url);
 
-    console.log(JSON.stringify(data,null,2))
+   // console.log(JSON.stringify(data,null,2))
   return data.data === 0;
 
 }//end of credit out
 
 
+
+
+export async function getHistory(account) {
+  let url = ROOT_URL + "get_history?";
+
+  for (let info in account) {
+    url += info.toString() + "=" + account[info] + "&";
+  }
+  
+  url += authPostfixHelper();
+
+  const{ data:{data}} =  await axios.get(url);
+ return data[0];
+
+}//end of get history
+
+
+
+export async function getTotalHistory(account) {
+  let url = ROOT_URL + "total_history?";
+
+  for (let info in account) {
+    url += info.toString() + "=" + account[info] + "&";
+  }
+  
+  url += authPostfixHelper();
+
+  const{ data:{data}} =  await axios.get(url);
+
+  console.log(data,"wwwwwwww")
+ //return data[0];
+
+}//end of get history
 
 
 
