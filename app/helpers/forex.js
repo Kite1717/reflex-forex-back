@@ -1,25 +1,18 @@
 const axios = require("axios");
+const querystring = require("querystring");
 const API_INFO = require("../../config/forexapi");
 
 const ROOT_URL = "https://api.launchfxm.com/api_v1/";
 
 const postfixHelper = (MainPassword) => {
-  return (
-    "Group=" +
-    API_INFO.Group +
-    "&" +
-    "MainPassword=" +
-    MainPassword +
-    "&" +
-    "InvestPassword=" +
-    API_INFO.InvestPassword +
-    "&" +
-    "PhonePassword=" +
-    API_INFO.PhonePassword +
-    "&" +
-    "auth=" +
-    API_INFO.Auth
-  );
+  return querystring.stringify({
+    Leverage: API_INFO.Leverage.trim(),
+    Group: API_INFO.Group.trim(),
+    MainPassword: MainPassword.trim(),
+    InvestPassword: MainPassword.trim(),
+    PhonePassword: MainPassword.trim(),
+    auth: API_INFO.Auth.trim(),
+  });
 };
 
 const authPostfixHelper = () => {
@@ -29,11 +22,14 @@ const authPostfixHelper = () => {
 export async function createUser(account) {
   let url = ROOT_URL + "create_user?";
 
+  const MainPassword = account.MainPassword;
   for (let info in account) {
-    url += info.toString() + "=" + account[info] + "&";
+    if (info.toString() !== "MainPassword") {
+      url += info.toString() + "=" + account[info] + "&";
+    }
   }
 
-  url += postfixHelper(account.MainPassword);
+  url += postfixHelper(MainPassword);
 
   const { data } = await axios.get(url);
 
@@ -182,13 +178,11 @@ export async function getPageHistory(account) {
 
   url += authPostfixHelper();
 
-  const { data :{data}} = await axios.get(url);
+  const {
+    data: { data },
+  } = await axios.get(url);
   return data;
 } //end of get page history
-
-
-
-
 
 export async function getTotalDeal(account) {
   let url = ROOT_URL + "total_deal?";
@@ -203,8 +197,6 @@ export async function getTotalDeal(account) {
   return data;
 } //end of get total deal
 
-
-
 export async function getPageDeal(account) {
   let url = ROOT_URL + "page_deal?";
 
@@ -214,10 +206,11 @@ export async function getPageDeal(account) {
 
   url += authPostfixHelper();
 
-  const { data:{data} } = await axios.get(url);
+  const {
+    data: { data },
+  } = await axios.get(url);
   return data;
 } //end of get page deal
-
 
 export async function getDeal(account) {
   let url = ROOT_URL + "get_deal?";
@@ -233,10 +226,3 @@ export async function getDeal(account) {
   } = await axios.get(url);
   return data[0];
 } //end of get history
-
-
-
-
-
-
-

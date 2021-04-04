@@ -1,13 +1,21 @@
+"use strict";
 module.exports = {
   up(queryInterface, Sequelize) {
     return Promise.all([
       queryInterface.addColumn(
-        'forexAccount', // table name
-        'Email', // new field name
+        "forexAccount", // table name
+        "qr_code", // new field name
+        {
+          type: Sequelize.BOOLEAN,
+          defaultValue: false,
+        }
+      ),
+      queryInterface.addColumn(
+        "forexAccount", // table name
+        "qr_code_image", // new field name
         {
           type: Sequelize.STRING,
-          allowNull: true,
-        },
+        }
       ),
     ]);
   },

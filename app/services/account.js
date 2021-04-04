@@ -28,19 +28,37 @@ app.post("/create-user", async (req, res) => {
     result.createdAt = new Date();
     result.updatedAt = new Date();
     result.creatorUserId = 1;
-    result.MainPassword = req.body.MainPassword
+
+    //hash password
+    let password = bcrypt.hashSync(
+      req.body.MainPassword,
+      Number.parseInt(authConfig.rounds)
+    );
+
+    result.MainPassword = password;
+    result.InvestPassword = password;
+    result.PhonePassword = password;
+
+    //add role
+    result.role = 1;
 
     db.Account.create(result)
-      .then(async(acc) => {
+      .then((user) => {
+        // await db.ULog.create({createdAt:result.createdAt,creatorUserId: result.creatorUserId,comment:"Hesap Oluşturdu"})
 
-       // await db.ULog.create({createdAt:result.createdAt,creatorUserId: result.creatorUserId,comment:"Hesap Oluşturdu"}) 
+        // We create the token
+        let token = jwt.sign({ user: user }, authConfig.secret, {
+          expiresIn: authConfig.expires,
+        });
 
         return res.json({
-          data: acc,
+          user: user,
+          token: token,
+          status: 1,
         });
       })
       .catch((err) => {
-        return res.status(500).json(err);
+        return res.status(500).json({ err, status: 0 });
       });
   });
 }); //end of create user
