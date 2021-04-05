@@ -25,16 +25,13 @@ const app = express.Router();
 //   bu isteği sonra logla başka bir table !!!
 app.post("/account-deposit", async (req, res) => {
   forex.accountDeposit(req.body).then((fores) => {
-
     if (fores) {
       forex.getUser({ Login: req.body.Login }).then((account) => {
         if (account.Login) {
-          
           let result = account;
           result.updatedAt = new Date();
-          
 
-          db.Account.update(result,{where:{Login: req.body.Login}})
+          db.Account.update(result, { where: { Login: req.body.Login } })
             .then((acc) => {
               return res.json({
                 data: acc,
@@ -43,104 +40,95 @@ app.post("/account-deposit", async (req, res) => {
             .catch((err) => {
               return res.status(500).json(err);
             });
-
         } else {
           return res.status(404).json({ msg: "Account not found" });
         }
       });
+    } else {
+      return res.status(404).json({ msg: "Account not found" });
     }
   });
 }); // end of account deposit
 
-
 app.post("/account-withdraw", async (req, res) => {
-    forex.accountWithdraw(req.body).then((fores) => {
-  
-      if (fores) {
-        forex.getUser({ Login: req.body.Login }).then((account) => {
-          if (account.Login) {
-            
-            let result = account;
-            result.updatedAt = new Date();
-            
-  
-            db.Account.update(result,{where:{Login: req.body.Login}})
-              .then((acc) => {
-                return res.json({
-                  data: acc,
-                });
-              })
-              .catch((err) => {
-                return res.status(500).json(err);
+  forex.accountWithdraw(req.body).then((fores) => {
+    if (fores) {
+      forex.getUser({ Login: req.body.Login }).then((account) => {
+        if (account.Login) {
+          let result = account;
+          result.updatedAt = new Date();
+
+          db.Account.update(result, { where: { Login: req.body.Login } })
+            .then((acc) => {
+              return res.json({
+                data: acc,
               });
-  
-          } else {
-            return res.status(404).json({ msg: "Account not found" });
-          }
-        });
-      }
-    });
-  }); // end of account withdraw
+            })
+            .catch((err) => {
+              return res.status(500).json(err);
+            });
+        } else {
+          return res.status(404).json({ msg: "Account not found" });
+        }
+      });
+    } else {
+      return res.status(404).json({ msg: "Account not found" });
+    }
+  });
+}); // end of account withdraw
 
+app.post("/credit-in", async (req, res) => {
+  forex.creditIn(req.body).then((fores) => {
+    if (fores) {
+      forex.getUser({ Login: req.body.Login }).then((account) => {
+        if (account.Login) {
+          let result = account;
+          result.updatedAt = new Date();
 
-  app.post("/credit-in", async (req, res) => {
-    forex.creditIn(req.body).then((fores) => {
-  
-      if (fores) {
-        forex.getUser({ Login: req.body.Login }).then((account) => {
-          if (account.Login) {
-            
-            let result = account;
-            result.updatedAt = new Date();
-            
-  
-            db.Account.update(result,{where:{Login: req.body.Login}})
-              .then((acc) => {
-                return res.json({
-                  data: acc,
-                });
-              })
-              .catch((err) => {
-                return res.status(500).json(err);
+          db.Account.update(result, { where: { Login: req.body.Login } })
+            .then((acc) => {
+              return res.json({
+                data: acc,
               });
-  
-          } else {
-            return res.status(404).json({ msg: "Account not found" });
-          }
-        });
-      }
-    });
-  }); // end of account credit in
+            })
+            .catch((err) => {
+              return res.status(500).json(err);
+            });
+        } else {
+          return res.status(404).json({ msg: "Account not found" });
+        }
+      });
+    } else {
+      return res.status(404).json({ msg: "Account not found" });
+    }
+  });
+}); // end of account credit in
 
+app.post("/credit-out", async (req, res) => {
+  forex.creditOut(req.body).then((fores) => {
+    if (fores) {
+      forex.getUser({ Login: req.body.Login }).then((account) => {
+        if (account.Login) {
+          let result = account;
+          result.updatedAt = new Date();
 
-  app.post("/credit-out", async (req, res) => {
-    forex.creditOut(req.body).then((fores) => {
-  
-      if (fores) {
-        forex.getUser({ Login: req.body.Login }).then((account) => {
-          if (account.Login) {
-            
-            let result = account;
-            result.updatedAt = new Date();
-            
-  
-            db.Account.update(result,{where:{Login: req.body.Login}})
-              .then((acc) => {
-                return res.json({
-                  data: acc,
-                });
-              })
-              .catch((err) => {
-                return res.status(500).json(err);
+          db.Account.update(result, { where: { Login: req.body.Login } })
+            .then((acc) => {
+              return res.json({
+                data: acc,
               });
-  
-          } else {
-            return res.status(404).json({ msg: "Account not found" });
-          }
-        });
-      }
-    });
-  }); // end of account credit out
-
+            })
+            .catch((err) => {
+              return res.status(500).json(err);
+            });
+        } else {
+          return res.status(404).json({ msg: "Account not found" });
+        }
+      });
+    } else {
+      return res.status(404).json({ msg: "Account not found" });
+    }
+  });
+}); // end of account credit out
 
 module.exports = app;

@@ -24,7 +24,10 @@ export async function createUser(account) {
 
   const MainPassword = account.MainPassword;
   for (let info in account) {
-    if (info.toString() !== "MainPassword") {
+    if (
+      info.toString() !== "MainPassword" ||
+      info.toString().toLowerCase() === info.toString()
+    ) {
       url += info.toString() + "=" + account[info] + "&";
     }
   }
@@ -39,11 +42,17 @@ export async function createUser(account) {
 export async function updateUser(account) {
   let url = ROOT_URL + "update_user?";
 
+  const MainPassword = account.MainPassword;
   for (let info in account) {
-    url += info.toString() + "=" + account[info] + "&";
+    if (
+      info.toString() !== "MainPassword" ||
+      info.toString().toLowerCase() === info.toString()
+    ) {
+      url += info.toString() + "=" + account[info] + "&";
+    }
   }
 
-  url += postfixHelper();
+  url += postfixHelper(MainPassword);
 
   const {
     data: { data },
