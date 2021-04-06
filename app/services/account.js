@@ -166,9 +166,6 @@ app.post("/send-user-email", async (req, res) => {
   } else {
     return res.status(404).json({ msg: "Invalid CodeLength" });
   }
-
-  db.Account.findOne({ where: { Email: Email } }).then((user) => {
-    if (user) {
       let transporter = nodemailer.createTransport({
         service: "gmail",
         auth: {
@@ -194,10 +191,6 @@ app.post("/send-user-email", async (req, res) => {
           });
         }
       });
-    } else {
-      return res.status(404).json({ msg: "Account not found" });
-    }
-  });
 });
 
 app.post("/login", async (req, res) => {
