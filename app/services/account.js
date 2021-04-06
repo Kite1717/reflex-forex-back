@@ -251,7 +251,6 @@ app.get("/me", auth([UserRolls.Admin, UserRolls.User]), async (req, res) => {
 
 app.post(
   "/set-auth",
-  auth([UserRolls.Admin, UserRolls.User]),
   async (req, res) => {
     let qr_code_image = req.body.qr_code_image;
     let Email = req.body.Email;
@@ -265,7 +264,7 @@ app.post(
         },
       }).then((user) => {
         if (user) {
-          if (bcrypt.compareSync(MainPassword, user.MainPassword)) {
+          if (bcrypt.compareSync(MainPassword, user.MainPassword)) { 
             // email password correct
 
             if (user.qr_code) {
