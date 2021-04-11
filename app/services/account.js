@@ -212,17 +212,17 @@ app.post("/login", async (req, res) => {
     }).then((user) => {
       if (user) {
         if (bcrypt.compareSync(MainPassword, user.MainPassword)) {
+          //We create the token
+          let token = jwt.sign({ user: user }, authConfig.secret, {
+            expiresIn: authConfig.expires,
+          });
           if (!user.qr_code) {
             return res.json({
               status: 2,
               user,
+              token: token,
             });
           } else {
-            //We create the token
-            let token = jwt.sign({ user: user }, authConfig.secret, {
-              expiresIn: authConfig.expires,
-            });
-
             return res.json({
               status: 1,
               image: user.qr_code_image,
