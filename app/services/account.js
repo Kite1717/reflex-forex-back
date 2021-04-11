@@ -103,11 +103,12 @@ app.put("/update-user", async (req, res) => {
           })
             .then((acc) => {
               //We create the token
-              let token = jwt.sign({ user: acc }, authConfig.secret, {
+              let token = jwt.sign({ user: acc[1][0] }, authConfig.secret, {
                 expiresIn: authConfig.expires,
               });
+
               return res.json({
-                data: acc,
+                data: acc[1][0],
                 token,
               });
             })
