@@ -110,10 +110,13 @@ app.put("/update-user", async (req, res) => {
               return res.json({
                 data: acc[1][0],
                 token,
+                status: 1,
               });
             })
             .catch((err) => {
-              return res.status(500).json(err);
+              return res
+                .status(500)
+                .json({ msg: "Account is not updated", status: 0 });
             });
         });
       }
