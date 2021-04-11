@@ -68,62 +68,83 @@ app.post("/create-user", async (req, res) => {
 }); //end of create user
 
 app.put("/update-user", async (req, res) => {
-  db.Account.findOne({ where: { Email: req.body.Email } }).then((user) => {
-    if (user) {
-      if (!bcrypt.compareSync(req.body.MainPassword, user.MainPassword)) {
-        res
-          .status(500)
-          .json({ msg: "Account password not correct", status: 0 });
-      } else {
-        req.body.Login = user.Login;
-        forex.updateUser(req.body).then((fores) => {
-          let result = fores;
+  if (req.body.MainPassword !== "" && req.body.MainPassword !== null) {
+    db.Account.findOne({ where: { Email: req.body.Email } }).then((user) => {
+      if (user) {
+        if (!bcrypt.compareSync(req.body.MainPassword, user.MainPassword)) {
+          res
+            .status(500)
+            .json({ to: "DB", msg: "Account password not correct", status: 0 });
+        } else {
+          req.body.Login = user.Login;
+          forex
+            .updateUser(req.body)
+            .then((fores) => {
+              let result = fores;
 
-          result.updatedAt = new Date();
+              result.updatedAt = new Date();
 
-          //hash password
-          let password = bcrypt.hashSync(
-            req.body.MainPassword,
-            Number.parseInt(authConfig.rounds)
-          );
+              //hash password
+              let password = bcrypt.hashSync(
+                req.body.MainPassword,
+                Number.parseInt(authConfig.rounds)
+              );
 
-          result.MainPassword = password;
-          result.InvestPassword = password;
-          result.PhonePassword = password;
+              result.MainPassword = password;
+              result.InvestPassword = password;
+              result.PhonePassword = password;
 
-          // lowercase areas
+              // lowercase areas
 
-          if (req.body.identificationNumber) {
-            result.identificationNumber = req.body.identificationNumber;
-          }
+              if (req.body.identificationNumber) {
+                result.identificationNumber = req.body.identificationNumber;
+              }
 
-          db.Account.update(result, {
-            where: { Login: result.Login },
-            returning: true,
-          })
-            .then((acc) => {
-              //We create the token
-              let token = jwt.sign({ user: acc[1][0] }, authConfig.secret, {
-                expiresIn: authConfig.expires,
-              });
+              db.Account.update(result, {
+                where: { Login: result.Login },
+                returning: true,
+              })
+                .then((acc) => {
+                  //We create the token
+                  let token = jwt.sign({ user: acc[1][0] }, authConfig.secret, {
+                    expiresIn: authConfig.expires,
+                  });
 
-              return res.json({
-                data: acc[1][0],
-                token,
-                status: 1,
-              });
+                  return res.json({
+                    data: acc[1][0],
+                    token,
+                    status: 1,
+                  });
+                })
+                .catch((err) => {
+                  return res
+                    .status(500)
+                    .json({
+                      to: "DB",
+                      msg: "Account is not updated",
+                      status: 0,
+                    });
+                });
             })
             .catch((err) => {
               return res
                 .status(500)
-                .json({ msg: "Account is not updated", status: 0 });
+                .json({
+                  to: "Forex",
+                  msg: "Account is not updated",
+                  status: 0,
+                });
             });
-        });
+        }
+      } else {
+        res
+          .status(500)
+          .json({ to: "DB", msg: "Account is not found", status: 0 });
       }
-    } else {
-      res.status(500).json({ msg: "Account is not found", status: 0 });
-    }
-  });
+    });
+  } else {
+    res.status(500).json({ to: "API", msg: "Invalid Password", status: 0 });
+  }
 });
 
 app.put("/delete-user", async (req, res) => {
