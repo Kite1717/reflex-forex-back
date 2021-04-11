@@ -166,9 +166,6 @@ app.post("/send-user-email", async (req, res) => {
   } else {
     return res.status(404).json({ msg: "Invalid CodeLength" });
   }
-
-  db.Account.findOne({ where: { Email: Email } }).then((user) => {
-    if (user) {
       let transporter = nodemailer.createTransport({
         service: "gmail",
         auth: {
@@ -194,10 +191,6 @@ app.post("/send-user-email", async (req, res) => {
           });
         }
       });
-    } else {
-      return res.status(404).json({ msg: "Account not found" });
-    }
-  });
 });
 
 app.post("/login", async (req, res) => {
@@ -258,7 +251,6 @@ app.get("/me", auth([UserRolls.Admin, UserRolls.User]), async (req, res) => {
 
 app.post(
   "/set-auth",
-  auth([UserRolls.Admin, UserRolls.User]),
   async (req, res) => {
     let qr_code_image = req.body.qr_code_image;
     let Email = req.body.Email;
@@ -272,7 +264,7 @@ app.post(
         },
       }).then((user) => {
         if (user) {
-          if (bcrypt.compareSync(MainPassword, user.MainPassword)) {
+          if (bcrypt.compareSync(MainPassword, user.MainPassword)) { 
             // email password correct
 
             if (user.qr_code) {
