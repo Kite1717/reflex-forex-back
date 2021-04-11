@@ -99,8 +99,13 @@ app.put("/update-user", async (req, res) => {
 
           db.Account.update(result, { where: { Login: result.Login } })
             .then((acc) => {
+              //We create the token
+              let token = jwt.sign({ user: acc }, authConfig.secret, {
+                expiresIn: authConfig.expires,
+              });
               return res.json({
                 data: acc,
+                token,
               });
             })
             .catch((err) => {
@@ -166,31 +171,31 @@ app.post("/send-user-email", async (req, res) => {
   } else {
     return res.status(404).json({ msg: "Invalid CodeLength" });
   }
-      let transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-          user: "reflextestmail@gmail.com",
-          pass: "fufgwligjgrvfwbw",
-        },
+  let transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: "reflextestmail@gmail.com",
+      pass: "fufgwligjgrvfwbw",
+    },
+  });
+  let mailOptions = {
+    from: "reflextestmail@gmail.com",
+    to: Email,
+    subject: "Nodemailer Test",
+    html: `<h1> ${authCode} </h1>`,
+  };
+  transporter.sendMail(mailOptions, (err, data) => {
+    if (!err) {
+      res.status(200).json({
+        status: "1",
+        authCode,
       });
-      let mailOptions = {
-        from: "reflextestmail@gmail.com",
-        to: Email,
-        subject: "Nodemailer Test",
-        html: `<h1> ${authCode} </h1>`,
-      };
-      transporter.sendMail(mailOptions, (err, data) => {
-        if (!err) {
-          res.status(200).json({
-            status: "1",
-            authCode,
-          });
-        } else {
-          res.status(500).json({
-            status: "0",
-          });
-        }
+    } else {
+      res.status(500).json({
+        status: "0",
       });
+    }
+  });
 });
 
 app.post("/login", async (req, res) => {
@@ -249,56 +254,53 @@ app.get("/me", auth([UserRolls.Admin, UserRolls.User]), async (req, res) => {
   }
 });
 
-app.post(
-  "/set-auth",
-  async (req, res) => {
-    let qr_code_image = req.body.qr_code_image;
-    let Email = req.body.Email;
-    let MainPassword = req.body.MainPassword;
-    let secret = req.body.qr_code_secret;
+app.post("/set-auth", async (req, res) => {
+  let qr_code_image = req.body.qr_code_image;
+  let Email = req.body.Email;
+  let MainPassword = req.body.MainPassword;
+  let secret = req.body.qr_code_secret;
 
-    if (qr_code_image && Email && MainPassword && secret) {
-      db.Account.findOne({
-        where: {
-          Email,
-        },
-      }).then((user) => {
-        if (user) {
-          if (bcrypt.compareSync(MainPassword, user.MainPassword)) { 
-            // email password correct
+  if (qr_code_image && Email && MainPassword && secret) {
+    db.Account.findOne({
+      where: {
+        Email,
+      },
+    }).then((user) => {
+      if (user) {
+        if (bcrypt.compareSync(MainPassword, user.MainPassword)) {
+          // email password correct
 
-            if (user.qr_code) {
-              return res.json({
-                status: 2,
-              });
-            } else {
-              //update
-
-              db.Account.update(
-                { qr_code: true, qr_code_image, qr_code_secret: secret },
-                { where: { Login: user.Login, qr_code: false } }
-              )
-                .then((acc) => {
-                  return res.json({
-                    status: 1,
-                  });
-                })
-                .catch((err) => {
-                  return res.status(500).json(err);
-                });
-            }
+          if (user.qr_code) {
+            return res.json({
+              status: 2,
+            });
           } else {
-            // Unauthorized Access
-            return res.status(401).json({ msg: "Incorrect password" });
+            //update
+
+            db.Account.update(
+              { qr_code: true, qr_code_image, qr_code_secret: secret },
+              { where: { Login: user.Login, qr_code: false } }
+            )
+              .then((acc) => {
+                return res.json({
+                  status: 1,
+                });
+              })
+              .catch((err) => {
+                return res.status(500).json(err);
+              });
           }
         } else {
-          return res.status(404).json({ msg: "Account not found" });
+          // Unauthorized Access
+          return res.status(401).json({ msg: "Incorrect password" });
         }
-      });
-    } else {
-      return res.status(500).json({ msg: "Invalid Data" });
-    }
+      } else {
+        return res.status(404).json({ msg: "Account not found" });
+      }
+    });
+  } else {
+    return res.status(500).json({ msg: "Invalid Data" });
   }
-);
+});
 
 module.exports = app;
