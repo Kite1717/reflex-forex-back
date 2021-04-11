@@ -97,7 +97,10 @@ app.put("/update-user", async (req, res) => {
             result.identificationNumber = req.body.identificationNumber;
           }
 
-          db.Account.update(result, { where: { Login: result.Login } })
+          db.Account.update(result, {
+            where: { Login: result.Login },
+            returning: true,
+          })
             .then((acc) => {
               //We create the token
               let token = jwt.sign({ user: acc }, authConfig.secret, {
