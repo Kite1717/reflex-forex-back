@@ -117,23 +117,19 @@ app.put("/update-user", async (req, res) => {
                   });
                 })
                 .catch((err) => {
-                  return res
-                    .status(500)
-                    .json({
-                      to: "DB",
-                      msg: "Account is not updated",
-                      status: 0,
-                    });
+                  return res.status(500).json({
+                    to: "DB",
+                    msg: "Account is not updated",
+                    status: 0,
+                  });
                 });
             })
             .catch((err) => {
-              return res
-                .status(500)
-                .json({
-                  to: "Forex",
-                  msg: "Account is not updated",
-                  status: 0,
-                });
+              return res.status(500).json({
+                to: "Forex",
+                msg: "Account is not updated",
+                status: 0,
+              });
             });
         }
       } else {
@@ -273,9 +269,18 @@ app.post("/login", async (req, res) => {
 //get token
 app.get("/me", auth([UserRolls.Admin, UserRolls.User]), async (req, res) => {
   if (req.user) {
-    return res.json({
-      type: true,
-      user: req.user,
+    forex.getUser({ Login: req.user.Login }).then((fores) => {
+      if (fores.Login) {
+        db.Account.findOne({ where: { Login: fores.Login } }).then((user) => {
+          return res.json({
+            forexApi: fores,
+            user: user,
+            type: true,
+          });
+        });
+      } else {
+        return res.status(404).json({ msg: "Account not found" });
+      }
     });
   } else {
     return res.status(401).json({ msg: "Unauthorized access" });
