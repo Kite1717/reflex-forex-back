@@ -99,17 +99,22 @@ app.post("/credit-in", async (req, res) => {
             .then((acc) => {
               return res.json({
                 data: acc,
+                status: 1,
               });
             })
             .catch((err) => {
-              return res.status(500).json(err);
+              return res.status(500).json({ msg: "DB error", status: 0 });
             });
         } else {
-          return res.status(404).json({ msg: "Account not found" });
+          return res
+            .status(404)
+            .json({ msg: "Forex Error User Not Found", status: 0 });
         }
       });
     } else {
-      return res.status(404).json({ msg: "Account not found" });
+      return res
+        .status(404)
+        .json({ msg: "Forex Error Credit In Error", status: 0 });
     }
   });
 }); // end of account credit in
@@ -126,17 +131,22 @@ app.post("/credit-out", async (req, res) => {
             .then((acc) => {
               return res.json({
                 data: acc,
+                status: 1,
               });
             })
             .catch((err) => {
-              return res.status(500).json(err);
+              return res.status(500).json({ msg: "DB error", status: 0 });
             });
         } else {
-          return res.status(404).json({ msg: "Account not found" });
+          return res
+            .status(404)
+            .json({ msg: "Forex Error User Not Found", status: 0 });
         }
       });
     } else {
-      return res.status(404).json({ msg: "Account not found" });
+      return res
+        .status(404)
+        .json({ msg: "Forex Error Credit Out Error", status: 0 });
     }
   });
 }); // end of account credit out

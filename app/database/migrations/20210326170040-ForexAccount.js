@@ -71,75 +71,75 @@ module.exports = {
         type: Sequelize.STRING,
       },
       CertSerialNumber: {
-        allowNull: false,
+        defaultValue: 0,
         type: Sequelize.INTEGER,
       },
       Rights: {
-        allowNull: false,
+        defaultValue: 0,
         type: Sequelize.INTEGER,
       },
       MQID: {
-        allowNull: false,
+        defaultValue: "",
         type: Sequelize.STRING,
       },
       Registration: {
-        allowNull: false,
+        defaultValue: 0,
         type: Sequelize.INTEGER,
       },
       LastAccess: {
-        allowNull: false,
+        defaultValue: 0,
         type: Sequelize.INTEGER,
       },
       LastPassChange: {
-        allowNull: false,
+        defaultValue: 0,
         type: Sequelize.INTEGER,
       },
       LastIP: {
-        allowNull: false,
+        defaultValue: "",
         type: Sequelize.STRING,
       },
       Name: {
-        allowNull: false,
+        defaultValue: "",
         type: Sequelize.STRING,
       },
       Company: {
-        allowNull: false,
+        defaultValue: "",
         type: Sequelize.STRING,
       },
       Account: {
-        allowNull: false,
+        defaultValue: "",
         type: Sequelize.STRING,
       },
       Country: {
-        allowNull: false,
+        defaultValue: "",
         type: Sequelize.STRING,
       },
       Language: {
-        allowNull: false,
+        defaultValue: 0,
         type: Sequelize.INTEGER,
       },
       ClientID: {
-        allowNull: false,
+        defaultValue: 0,
         type: Sequelize.INTEGER,
       },
       City: {
-        allowNull: false,
+        defaultValue: "",
         type: Sequelize.STRING,
       },
       State: {
-        allowNull: false,
+        defaultValue: "",
         type: Sequelize.STRING,
       },
       ZipCode: {
-        allowNull: false,
+        defaultValue: "",
         type: Sequelize.STRING,
       },
       Address: {
-        allowNull: false,
+        defaultValue: "",
         type: Sequelize.STRING,
       },
       Phone: {
-        allowNull: false,
+        defaultValue: "",
         type: Sequelize.STRING,
       },
       Email: {
@@ -147,19 +147,19 @@ module.exports = {
         type: Sequelize.STRING,
       },
       ID: {
-        allowNull: false,
+        defaultValue: "",
         type: Sequelize.STRING,
       },
       Status: {
-        allowNull: false,
+        defaultValue: "",
         type: Sequelize.STRING,
       },
       Comment: {
-        allowNull: false,
+        defaultValue: "",
         type: Sequelize.STRING,
       },
       Color: {
-        allowNull: false,
+        defaultValue: 0,
         type: Sequelize.INTEGER,
       },
       PhonePassword: {
@@ -167,99 +167,96 @@ module.exports = {
         type: Sequelize.STRING,
       },
       Leverage: {
-        allowNull: false,
+        defaultValue: 300,
         type: Sequelize.INTEGER,
       },
       Agent: {
-        allowNull: false,
+        defaultValue: 0,
         type: Sequelize.REAL,
       },
       Balance: {
-        allowNull: false,
+        defaultValue: 0,
         type: Sequelize.REAL,
       },
       Credit: {
-        allowNull: false,
+        defaultValue: 0,
         type: Sequelize.REAL,
       },
 
       //Deposit******************
       Equity: {
-        allowNull: false,
         defaultValue: 0,
         type: Sequelize.REAL,
       },
       Margin: {
-        allowNull: false,
-        defaultValue:0,
+        defaultValue: 0,
         type: Sequelize.REAL,
       },
       MarginFree: {
-        allowNull: false,
-        defaultValue:0,
+        defaultValue: 0,
         type: Sequelize.REAL,
       },
       MarginLevel: {
-        allowNull: false,
-        defaultValue:0,
+        defaultValue: 0,
         type: Sequelize.REAL,
       },
       Floating: {
-        allowNull: false,
-        defaultValue:0,
+        defaultValue: 0,
         type: Sequelize.REAL,
       },
-//*************************** */
+      //*************************** */
 
       InterestRate: {
-        allowNull: false,
+        defaultValue: 0,
         type: Sequelize.REAL,
       },
       CommissionDaily: {
-        allowNull: false,
+        defaultValue: 0,
         type: Sequelize.REAL,
       },
       CommissionMonthly: {
-        allowNull: false,
+        defaultValue: 0,
         type: Sequelize.REAL,
       },
       BalancePrevDay: {
-        allowNull: false,
+        defaultValue: 0,
         type: Sequelize.REAL,
       },
       BalancePrevMonth: {
-        allowNull: false,
+        defaultValue: 0,
         type: Sequelize.REAL,
       },
       EquityPrevDay: {
-        allowNull: false,
+        defaultValue: 0,
         type: Sequelize.REAL,
       },
       EquityPrevMonth: {
-        allowNull: false,
+        defaultValue: 0,
         type: Sequelize.REAL,
       },
       TradeAccounts: {
-        allowNull: false,
+        defaultValue: "",
         type: Sequelize.STRING,
       },
       LeadCampaign: {
-        allowNull: false,
+        defaultValue: "",
         type: Sequelize.STRING,
       },
       LeadSource: {
-        allowNull: false,
+        defaultValue: "",
         type: Sequelize.STRING,
       },
       LeadSource: {
-        allowNull: false,
+        defaultValue: "",
         type: Sequelize.STRING,
       },
 
       MainPassword: {
+        allowNull: false,
         type: Sequelize.STRING,
       },
       InvestPassword: {
+        allowNull: false,
         type: Sequelize.STRING,
       },
       creatorUserId: {

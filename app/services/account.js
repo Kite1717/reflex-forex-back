@@ -336,4 +336,21 @@ app.post("/set-auth", async (req, res) => {
   }
 });
 
+app.get("/all-users", async (req, res) => {
+  db.Account.findAll({
+    where: {
+      role: { [Op.not]: 0 },
+    },
+  })
+    .then((users) => {
+      return res.json({
+        status: 1,
+        users,
+      });
+    })
+    .catch((err) => {
+      res.status(500).json({ msg: "Users Not Found", status: 0 });
+    });
+});
+
 module.exports = app;
