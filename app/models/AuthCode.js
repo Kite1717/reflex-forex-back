@@ -1,8 +1,8 @@
 "use strict";
 
 module.exports = (sequelize, DataTypes) => {
-  const AutCode = sequelize.define(
-    "AutCode",
+  const AuthCode = sequelize.define(
+    "AuthCode",
     {
       id: {
         allowNull: false,
@@ -20,10 +20,10 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       tableName: "authCodes",
-      paranoid: true,
-      timestamps: true,
+      paranoid: false,
+      timestamps: false,
     }
   );
 
-  return AutCode;
+  return AuthCode;
 };

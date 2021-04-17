@@ -228,11 +228,12 @@ app.post("/send-user-email", async (req, res) => {
     } else {
       transporter.sendMail(mailOptions, (err, data) => {
         if (!err) {
-          db.AutCode.findOne({ where: { Email: req.body.Email } })
+          db.AuthCode.findOne({ where: { Email: req.body.Email } })
             .then((auth) => {
+              console.log(auth, "wwww");
               if (auth) {
-                db.AutCode.update(
-                  { authCode },
+                db.AuthCode.update(
+                  { Code: authCode },
                   { where: { Email: req.body.Email } }
                 )
                   .then((upt) => {
@@ -248,7 +249,7 @@ app.post("/send-user-email", async (req, res) => {
                     });
                   });
               } else {
-                db.AutCode.create({ authCode })
+                db.AuthCode.create({ Code: authCode, Email })
                   .then((upt) => {
                     res.status(200).json({
                       status: "1",
