@@ -194,7 +194,7 @@ app.get("/get-user/:login", async (req, res) => {
 
 app.post("/send-user-email", async (req, res) => {
   let Email = req.body.Email;
-  let CodeLength = parseInt(req.body.CodeLength);
+  let CodeLength = 6;
 
   let authCode = 0;
   if (!Number.isNaN(CodeLength) && CodeLength >= 4) {
@@ -219,25 +219,62 @@ app.post("/send-user-email", async (req, res) => {
     subject: "Nodemailer Test",
     html: `<h1> ${authCode} </h1>`,
   };
-  transporter.sendMail(mailOptions, (err, data) => {
-    if (!err) {
-      db.Account.update({ authCode }, { where: { Email: req.body.Email } })
-        .then(() => {
-          res.status(200).json({
-            status: "1",
-            msg: "success",
-          });
-        })
-        .catch((err) => {
+
+  db.Account.findOne({ where: { Email: req.body.Email } }).then((user) => {
+    if (user) {
+      return res
+        .status(500)
+        .json({ msg: "Already account existing", status: 0 });
+    } else {
+      transporter.sendMail(mailOptions, (err, data) => {
+        if (!err) {
+          db.AutCode.findOne({ where: { Email: req.body.Email } })
+            .then((auth) => {
+              if (auth) {
+                db.AutCode.update(
+                  { authCode },
+                  { where: { Email: req.body.Email } }
+                )
+                  .then((upt) => {
+                    res.status(200).json({
+                      status: "1",
+                      msg: "success",
+                    });
+                  })
+                  .catch((err) => {
+                    res.status(500).json({
+                      status: "0",
+                      msg: "ErroR Email Code Update",
+                    });
+                  });
+              } else {
+                db.AutCode.create({ authCode })
+                  .then((upt) => {
+                    res.status(200).json({
+                      status: "1",
+                      msg: "success",
+                    });
+                  })
+                  .catch((err) => {
+                    res.status(500).json({
+                      status: "0",
+                      msg: "ErroR Email Code Update",
+                    });
+                  });
+              }
+            })
+            .catch((err) => {
+              res.status(500).json({
+                status: "0",
+                msg: "Account Not Found...",
+              });
+            });
+        } else {
           res.status(500).json({
             status: "0",
-            msg: "Account Not Found...",
+            msg: "Email sender not working",
           });
-        });
-    } else {
-      res.status(500).json({
-        status: "0",
-        msg: "Email sender not working",
+        }
       });
     }
   });
