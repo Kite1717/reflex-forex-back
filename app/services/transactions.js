@@ -33,6 +33,9 @@ app.post("/account-deposit", async (req, res) => {
             let result = account;
             result.updatedAt = new Date();
 
+            delete result.MainPassword;
+            delete result.PhonePassword;
+            delete result.InvestPassword;
             db.Account.update(result, { where: { Login: req.body.Login } })
               .then((acc) => {
                 return res.json({
@@ -41,6 +44,7 @@ app.post("/account-deposit", async (req, res) => {
                 });
               })
               .catch((err) => {
+                console.log(err);
                 return res.status(500).json({ msg: "DB error", status: 0 });
               });
           } else {
@@ -69,6 +73,9 @@ app.post("/account-withdraw", async (req, res) => {
           if (account.Login) {
             let result = account;
             result.updatedAt = new Date();
+            delete result.MainPassword;
+            delete result.PhonePassword;
+            delete result.InvestPassword;
 
             db.Account.update(result, { where: { Login: req.body.Login } })
               .then((acc) => {
@@ -106,6 +113,9 @@ app.post("/credit-in", async (req, res) => {
           if (account.Login) {
             let result = account;
             result.updatedAt = new Date();
+            delete result.MainPassword;
+            delete result.PhonePassword;
+            delete result.InvestPassword;
 
             db.Account.update(result, { where: { Login: req.body.Login } })
               .then((acc) => {
@@ -143,6 +153,9 @@ app.post("/credit-out", async (req, res) => {
           if (account.Login) {
             let result = account;
             result.updatedAt = new Date();
+            delete result.MainPassword;
+            delete result.PhonePassword;
+            delete result.InvestPassword;
 
             db.Account.update(result, { where: { Login: req.body.Login } })
               .then((acc) => {
