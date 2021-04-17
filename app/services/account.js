@@ -371,13 +371,9 @@ app.get("/me", auth([UserRolls.Admin, UserRolls.User]), async (req, res) => {
         attributes: {
           exclude: ["MainPassword", "InvestPassword", "PhonePassword"],
         },
-        where: { Login: req.user.Email },
+        where: { Email: req.user.Email },
       }).then((user) => {
-        fores.MainPassword = "";
-        fores.InvestPassword = "";
-        fores.PhonePassword = "";
         return res.json({
-          forexApi: fores,
           user,
           type: true,
         });
