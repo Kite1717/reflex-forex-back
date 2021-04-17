@@ -282,10 +282,10 @@ app.post("/send-user-email", async (req, res) => {
 });
 
 app.post("/check-auth-code", async (req, res) => {
-  db.Account.findOne({ where: { Email: req.body.Email } })
+  db.AuthCode.findOne({ where: { Email: req.body.Email } })
     .then((user) => {
-      if (user.authCode) {
-        if (user.authCode === req.body.Code) {
+      if (user.Code) {
+        if (user.Code === req.body.Code) {
           res.status(200).json({
             status: "1",
             msg: "success",
