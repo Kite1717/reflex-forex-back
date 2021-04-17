@@ -210,6 +210,9 @@ module.exports = (sequelize, DataTypes) => {
       InvestPassword: {
         type: DataTypes.STRING,
       },
+      authCode: {
+        type: DataTypes.INTEGER,
+      },
       creatorUserId: {
         allowNull: false,
         type: DataTypes.INTEGER,

@@ -54,6 +54,9 @@ app.post("/create-user", async (req, res) => {
         db.Account.create(result)
           .then((user) => {
             // await db.ULog.create({createdAt:result.createdAt,creatorUserId: result.creatorUserId,comment:"Hesap Oluşturdu"})
+            user.MainPassword = "";
+            user.InvestPassword = "";
+            user.PhonePassword = "";
             return res.json({
               user: user,
               status: 1,
@@ -169,7 +172,15 @@ app.put("/delete-user", async (req, res) => {
 app.get("/get-user/:login", async (req, res) => {
   forex.getUser({ Login: req.params.login }).then((fores) => {
     if (fores.Login) {
-      db.Account.findOne({ where: { Login: fores.Login } }).then((user) => {
+      db.Account.findOne({
+        attributes: {
+          exclude: ["MainPassword", "InvestPassword", "PhonePassword"],
+        },
+        where: { Login: fores.Login },
+      }).then((user) => {
+        fores.MainPassword = "";
+        fores.InvestPassword = "";
+        fores.PhonePassword = "";
         return res.json({
           forexApi: fores,
           db: user,
@@ -210,16 +221,56 @@ app.post("/send-user-email", async (req, res) => {
   };
   transporter.sendMail(mailOptions, (err, data) => {
     if (!err) {
-      res.status(200).json({
-        status: "1",
-        authCode,
-      });
+      db.Account.update({ authCode }, { where: { Email: req.body.Email } })
+        .then(() => {
+          res.status(200).json({
+            status: "1",
+            msg: "success",
+          });
+        })
+        .catch((err) => {
+          res.status(500).json({
+            status: "0",
+            msg: "Account Not Found...",
+          });
+        });
     } else {
       res.status(500).json({
         status: "0",
+        msg: "Email sender not working",
       });
     }
   });
+});
+
+app.post("/check-auth-code", async (req, res) => {
+  db.Account.findOne({ where: { Email: req.body.Email } })
+    .then((user) => {
+      if (user.authCode) {
+        if (user.authCode === req.body.Code) {
+          res.status(200).json({
+            status: "1",
+            msg: "success",
+          });
+        } else {
+          res.status(500).json({
+            status: "0",
+            msg: "Does not match codes",
+          });
+        }
+      } else {
+        res.status(500).json({
+          status: "0",
+          msg: "Auth Code Not Generated",
+        });
+      }
+    })
+    .catch((err) => {
+      res.status(500).json({
+        status: "0",
+        msg: "Account Not Found...",
+      });
+    });
 });
 
 app.post("/login", async (req, res) => {
@@ -231,36 +282,44 @@ app.post("/login", async (req, res) => {
       where: {
         Email,
       },
-    }).then((user) => {
-      if (user) {
-        if (bcrypt.compareSync(MainPassword, user.MainPassword)) {
-          //We create the token
-          let token = jwt.sign({ user: user }, authConfig.secret, {
-            expiresIn: authConfig.expires,
-          });
-          if (!user.qr_code) {
-            return res.json({
-              status: 2,
-              user,
-              token: token,
+    })
+      .then((user) => {
+        if (user) {
+          if (bcrypt.compareSync(MainPassword, user.MainPassword)) {
+            //We create the token
+            let token = jwt.sign({ user: user }, authConfig.secret, {
+              expiresIn: authConfig.expires,
             });
+
+            user.MainPassword = "";
+            user.InvestPassword = "";
+            user.PhonePassword = "";
+            if (!user.qr_code) {
+              return res.json({
+                status: 2,
+                user,
+                token: token,
+              });
+            } else {
+              return res.json({
+                status: 1,
+                image: user.qr_code_image,
+                secret: user.qr_code_secret,
+                user,
+                token: token,
+              });
+            }
           } else {
-            return res.json({
-              status: 1,
-              image: user.qr_code_image,
-              secret: user.qr_code_secret,
-              user,
-              token: token,
-            });
+            // Unauthorized Access
+            return res.status(401).json({ msg: "Incorrect password" });
           }
         } else {
-          // Unauthorized Access
-          return res.status(401).json({ msg: "Incorrect password" });
+          return res.status(404).json({ msg: "Account not found" });
         }
-      } else {
+      })
+      .catch((err) => {
         return res.status(404).json({ msg: "Account not found" });
-      }
-    });
+      });
   } else {
     return res.status(500).json({ msg: "Invalid Data" });
   }
@@ -271,10 +330,18 @@ app.get("/me", auth([UserRolls.Admin, UserRolls.User]), async (req, res) => {
   if (req.user) {
     forex.getUser({ Login: req.user.Login }).then((fores) => {
       if (fores.Login) {
-        db.Account.findOne({ where: { Login: fores.Login } }).then((user) => {
+        db.Account.findOne({
+          attributes: {
+            exclude: ["MainPassword", "InvestPassword", "PhonePassword"],
+          },
+          where: { Login: fores.Login },
+        }).then((user) => {
+          fores.MainPassword = "";
+          fores.InvestPassword = "";
+          fores.PhonePassword = "";
           return res.json({
             forexApi: fores,
-            user: user,
+            user,
             type: true,
           });
         });
@@ -338,6 +405,9 @@ app.post("/set-auth", async (req, res) => {
 
 app.get("/all-users", async (req, res) => {
   db.Account.findAll({
+    attributes: {
+      exclude: ["MainPassword", "InvestPassword", "PhonePassword"],
+    },
     where: {
       role: { [Op.not]: 0 },
     },
