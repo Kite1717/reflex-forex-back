@@ -366,27 +366,45 @@ app.post("/login", async (req, res) => {
 //get token
 app.get("/me", auth([UserRolls.Admin, UserRolls.User]), async (req, res) => {
   if (req.user) {
-    forex.getUser({ Login: req.user.Login }).then((fores) => {
-      if (fores.Login) {
-        db.Account.findOne({
-          attributes: {
-            exclude: ["MainPassword", "InvestPassword", "PhonePassword"],
-          },
-          where: { Login: fores.Login },
-        }).then((user) => {
-          fores.MainPassword = "";
-          fores.InvestPassword = "";
-          fores.PhonePassword = "";
-          return res.json({
-            forexApi: fores,
-            user,
-            type: true,
-          });
+    if (req.user.role === 0) {
+      db.Account.findOne({
+        attributes: {
+          exclude: ["MainPassword", "InvestPassword", "PhonePassword"],
+        },
+        where: { Login: req.user.Email },
+      }).then((user) => {
+        fores.MainPassword = "";
+        fores.InvestPassword = "";
+        fores.PhonePassword = "";
+        return res.json({
+          forexApi: fores,
+          user,
+          type: true,
         });
-      } else {
-        return res.status(404).json({ msg: "Account not found" });
-      }
-    });
+      });
+    } else {
+      forex.getUser({ Login: req.user.Login }).then((fores) => {
+        if (fores.Login) {
+          db.Account.findOne({
+            attributes: {
+              exclude: ["MainPassword", "InvestPassword", "PhonePassword"],
+            },
+            where: { Login: fores.Login },
+          }).then((user) => {
+            fores.MainPassword = "";
+            fores.InvestPassword = "";
+            fores.PhonePassword = "";
+            return res.json({
+              forexApi: fores,
+              user,
+              type: true,
+            });
+          });
+        } else {
+          return res.status(404).json({ msg: "Account not found" });
+        }
+      });
+    }
   } else {
     return res.status(401).json({ msg: "Unauthorized access" });
   }
