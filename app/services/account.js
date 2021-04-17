@@ -448,6 +448,7 @@ app.get("/all-users", async (req, res) => {
     },
     where: {
       role: { [Op.not]: 0 },
+      qr_code: true,
     },
   })
     .then((users) => {
