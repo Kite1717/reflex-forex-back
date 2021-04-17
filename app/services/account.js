@@ -170,26 +170,36 @@ app.put("/delete-user", async (req, res) => {
 
 //bunu bi kontrol et ilerde  cevapda başka verilerde geliyor
 app.get("/get-user/:login", async (req, res) => {
-  forex.getUser({ Login: req.params.login }).then((fores) => {
-    if (fores.Login) {
-      db.Account.findOne({
-        attributes: {
-          exclude: ["MainPassword", "InvestPassword", "PhonePassword"],
-        },
-        where: { Login: fores.Login },
-      }).then((user) => {
-        fores.MainPassword = "";
-        fores.InvestPassword = "";
-        fores.PhonePassword = "";
-        return res.json({
-          forexApi: fores,
-          db: user,
+  forex
+    .getUser({ Login: req.params.login })
+    .then((fores) => {
+      if (fores.Login) {
+        db.Account.findOne({
+          attributes: {
+            exclude: ["MainPassword", "InvestPassword", "PhonePassword"],
+          },
+          where: { Login: fores.Login },
+        }).then((user) => {
+          fores.MainPassword = "";
+          fores.InvestPassword = "";
+          fores.PhonePassword = "";
+          return res.json({
+            forexApi: fores,
+            db: user,
+            status: 1,
+          });
         });
-      });
-    } else {
-      return res.status(404).json({ msg: "Account not found" });
-    }
-  });
+      } else {
+        return res
+          .status(404)
+          .json({ msg: "DB ERROR Account not found", status: 0 });
+      }
+    })
+    .catch(() => {
+      return res
+        .status(500)
+        .json({ msg: "FOREX ERROR Account not found", status: 0 });
+    });
 });
 
 app.post("/send-user-email", async (req, res) => {
