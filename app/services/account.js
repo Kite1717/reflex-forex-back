@@ -83,49 +83,61 @@ app.put("/update-user", async (req, res) => {
           forex
             .updateUser(req.body)
             .then((fores) => {
-              let result = fores;
-
-              result.updatedAt = new Date();
-
-              //hash password
-              let password = bcrypt.hashSync(
-                req.body.MainPassword,
-                Number.parseInt(authConfig.rounds)
-              );
-
-              result.MainPassword = password;
-              result.InvestPassword = password;
-              result.PhonePassword = password;
-
-              // lowercase areas
-
-              if (req.body.identificationNumber) {
-                result.identificationNumber = req.body.identificationNumber;
-              }
-
-              db.Account.update(result, {
-                where: { Login: result.Login },
-                returning: true,
-              })
-                .then((acc) => {
-                  //We create the token
-                  let token = jwt.sign({ user: acc[1][0] }, authConfig.secret, {
-                    expiresIn: authConfig.expires,
-                  });
-
-                  return res.json({
-                    data: acc[1][0],
-                    token,
-                    status: 1,
-                  });
-                })
-                .catch((err) => {
-                  return res.status(500).json({
-                    to: "DB",
-                    msg: "Account is not updated",
-                    status: 0,
-                  });
+              if (fores.data === null) {
+                return res.status(500).json({
+                  to: "Forex",
+                  msg: "Account is not updated",
+                  status: 0,
                 });
+              } else {
+                let result = fores;
+
+                result.updatedAt = new Date();
+                delete result.MainPassword;
+                delete result.InvestPassword;
+                delete result.PhonePassword;
+
+                // lowercase areas
+
+                if (req.body.identificationNumber) {
+                  result.identificationNumber = req.body.identificationNumber;
+                }
+
+                db.Account.update(result, {
+                  attributes: {
+                    exclude: [
+                      "MainPassword",
+                      "InvestPassword",
+                      "PhonePassword",
+                    ],
+                  },
+                  where: { Login: result.Login },
+                  returning: true,
+                })
+                  .then((acc) => {
+                    //We create the token
+                    let token = jwt.sign(
+                      { user: acc[1][0] },
+                      authConfig.secret,
+                      {
+                        expiresIn: authConfig.expires,
+                      }
+                    );
+
+                    return res.json({
+                      data: acc[1][0],
+                      token,
+                      status: 1,
+                    });
+                  })
+                  .catch((err) => {
+                    return res.status(500).json({
+                      to: "DB",
+                      msg: "Account is not updated",
+                      status: 0,
+                    });
+                  });
+              }
             })
             .catch((err) => {
               return res.status(500).json({
