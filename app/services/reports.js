@@ -36,12 +36,13 @@ app.post("/total-history", async (req, res) => {
 
 app.post("/page-history", async (req, res) => {
   forex.getPageHistory(req.body).then((fores) => {
-    if (fores.length > 0) {
+    if (fores) {
       return res.json({
         data: fores,
+        status: 1,
       });
     } else {
-      return res.status(404).json({ msg: "Ticket not found" });
+      return res.status(404).json({ msg: "Ticket not found", status: 0 });
     }
   });
 }); // end of get page history
@@ -72,12 +73,13 @@ app.post("/total-deal", async (req, res) => {
 
 app.post("/page-deal", async (req, res) => {
   forex.getPageDeal(req.body).then((fores) => {
-    if (fores.length > 0) {
+    if (fores) {
       return res.json({
         data: fores,
+        status: 1,
       });
     } else {
-      return res.status(404).json({ msg: "Ticket not found" });
+      return res.status(404).json({ msg: "Ticket not found", status: 0 });
     }
   });
 }); // end of get page history
