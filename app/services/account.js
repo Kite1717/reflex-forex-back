@@ -124,7 +124,7 @@ app.put("/update-user", async (req, res) => {
                       }
                     );
 
-                    return res.json({
+                    return res.status(200).json({
                       data: acc[1][0],
                       token,
                       status: 1,
