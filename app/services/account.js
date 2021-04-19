@@ -195,11 +195,31 @@ app.get("/get-user/:login", async (req, res) => {
           fores.MainPassword = "";
           fores.InvestPassword = "";
           fores.PhonePassword = "";
-          return res.json({
-            forexApi: fores,
-            db: user,
-            status: 1,
+
+          //Update Infos
+          for (var att in fores) {
+            if (
+              att.toString() !== "PhonePassword" &&
+              att.toString() !== "MainPassword" &&
+              att.toString() !== "InvestPassword" &&
+              user[att] !== undefined &&
+              user[att] !== null &&
+              fores[att] !== user[att]
+            ) {
+              user[att] = fores[att];
+            }
+          }
+
+          db.Account.update(user.toJSON(), {
+            where: { Login: user.Login },
+          }).then((ff) => {
+            return res.json({
+              forexApi: fores,
+              db: user,
+              status: 1,
+            });
           });
+          //end update info
         });
       } else {
         return res
@@ -252,7 +272,6 @@ app.post("/send-user-email", async (req, res) => {
         if (!err) {
           db.AuthCode.findOne({ where: { Email: req.body.Email } })
             .then((auth) => {
-              console.log(auth, "wwww");
               if (auth) {
                 db.AuthCode.update(
                   { Code: authCode },
@@ -412,11 +431,31 @@ app.get("/me", auth([UserRolls.Admin, UserRolls.User]), async (req, res) => {
             fores.MainPassword = "";
             fores.InvestPassword = "";
             fores.PhonePassword = "";
-            return res.json({
-              forexApi: fores,
-              user,
-              type: true,
+
+            //Update Infos
+            for (var att in fores) {
+              if (
+                att.toString() !== "PhonePassword" &&
+                att.toString() !== "MainPassword" &&
+                att.toString() !== "InvestPassword" &&
+                user[att] !== undefined &&
+                user[att] !== null &&
+                fores[att] !== user[att]
+              ) {
+                user[att] = fores[att];
+              }
+            }
+
+            db.Account.update(user.toJSON(), {
+              where: { Login: user.Login },
+            }).then(() => {
+              return res.json({
+                forexApi: fores,
+                user,
+                type: true,
+              });
             });
+            //end update info
           });
         } else {
           return res.status(404).json({ msg: "Account not found" });
@@ -487,7 +526,33 @@ app.get("/all-users", async (req, res) => {
       qr_code: true,
     },
   })
-    .then((users) => {
+    .then(async (users) => {
+      for (let i = 0; i < users.length; i++) {
+        await forex.getUser({ Login: users[i].Login }).then((fores) => {
+          if (fores.Login) {
+            //Update Infos
+            for (var att in fores) {
+              if (
+                att.toString() !== "PhonePassword" &&
+                att.toString() !== "MainPassword" &&
+                att.toString() !== "InvestPassword" &&
+                users[i][att] !== undefined &&
+                users[i][att] !== null &&
+                fores[att] !== users[i][att]
+              ) {
+                users[i][att] = fores[att];
+              }
+            }
+            db.Account.update(users[i].toJSON(), {
+              where: { Login: users[i].Login },
+            }).then((ff) => {
+              //console.log(ff.toJSON(), "wwwwwwwwwww");
+            });
+            //end update info
+          }
+        });
+      }
+
       return res.json({
         status: 1,
         users,
