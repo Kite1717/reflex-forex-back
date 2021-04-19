@@ -28,12 +28,11 @@ export async function createUser(account) {
       info.toString() !== "MainPassword" ||
       info.toString().toLowerCase() === info.toString()
     ) {
-      url += info.toString() + "=" + account[info] + "&";
+      url += info.toString() + "=" + encodeURI(account[info]) + "&";
     }
   }
 
   url += postfixHelper(MainPassword);
-
   const { data } = await axios.get(url);
 
   return data;
@@ -48,7 +47,7 @@ export async function updateUser(account) {
       info.toString() !== "MainPassword" ||
       info.toString().toLowerCase() === info.toString()
     ) {
-      url += info.toString() + "=" + account[info] + "&";
+      url += info.toString() + "=" + encodeURI(account[info]) + "&";
     }
   }
 
