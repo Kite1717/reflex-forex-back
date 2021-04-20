@@ -98,6 +98,8 @@ app.get("/get-deal/:ticket", async (req, res) => {
 
 //history real
 app.post("/page-history-detail", async (req, res) => {
+  const total = req.body.Total;
+  req.body.Total = 99999;
   forex
     .getPageDeal(req.body)
     .then((deal) => {
@@ -116,6 +118,14 @@ app.post("/page-history-detail", async (req, res) => {
                     deal[i].Price !== history[j].PriceCurrent
                   ) {
                     count++;
+
+                    //limit
+                    if (count === total) {
+                      return res.json({
+                        data: temp,
+                        status: 1,
+                      });
+                    }
 
                     let change =
                       (
