@@ -119,14 +119,6 @@ app.post("/page-history-detail", async (req, res) => {
                   ) {
                     count++;
 
-                    //limit
-                    if (count === total) {
-                      return res.json({
-                        data: temp,
-                        status: 1,
-                      });
-                    }
-
                     let change =
                       (
                         (history[j].Type === 1 ? -100 : 100) +
@@ -186,6 +178,14 @@ app.post("/page-history-detail", async (req, res) => {
                       Profit: deal[i].Profit,
                       Change: change,
                     });
+
+                    //limit
+                    if (count === total) {
+                      return res.json({
+                        data: temp,
+                        status: 1,
+                      });
+                    }
                   }
                 }
               }
