@@ -214,4 +214,60 @@ app.post("/page-history-detail", async (req, res) => {
     });
 }); // end of get page history
 
+app.post("/live-trading", async (req, res) => {
+  const total = req.body.Total;
+  req.body.Total = 99999;
+  forex.getPageDeal(req.body).then((deal) => {
+    if (deal) {
+      let temp = [];
+      let count = 0;
+      temp.push();
+      for (let i = 0; i < deal.length; i++) {
+        if (
+          deal.filter((item) => item.PositionID === deal[i].PositionID)
+            .length === 1 &&
+          deal[i].Action !== 3 &&
+          deal[i].Action !== 2
+        ) {
+          count++;
+          temp.push({
+            Symbol: deal[i].Symbol,
+            Ticket: deal[i].PositionID,
+            Time:
+              new Date(Number(deal[i].Time * 1000))
+                .toISOString()
+                .substr(0, 10) +
+              " " +
+              new Date(Number(deal[i].Time * 1000)).toISOString().substr(11, 8),
+
+            Type: deal[i].Action === 1 ? "Sell" : "Buy",
+            Volume: deal[i].Volume / 10000,
+            Price: deal[i].Price,
+
+            SL: deal[i].PriceSL,
+            TP: deal[i].PriceTP,
+            PriceC: 0,
+            Swap: deal[i].Storage,
+            Profit: deal[i].Profit,
+          });
+
+          //limit
+          if (count === total) {
+            return res.json({
+              data: temp,
+              status: 1,
+            });
+          }
+        }
+      }
+      return res.json({
+        data: temp,
+        status: 1,
+      });
+    } else {
+      return res.status(404).json({ msg: "Ticket not found", status: 0 });
+    }
+  });
+}); // end of get page history
+
 module.exports = app;
