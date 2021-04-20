@@ -72,10 +72,10 @@ app.post("/total-deal", async (req, res) => {
 }); // end of get history
 
 app.post("/page-deal", async (req, res) => {
-  forex.getPageDeal(req.body).then((fores) => {
-    if (fores) {
+  forex.getPageDeal(req.body).then((deal) => {
+    if (deal) {
       return res.json({
-        data: fores,
+        data: deal,
         status: 1,
       });
     } else {
@@ -95,5 +95,111 @@ app.get("/get-deal/:ticket", async (req, res) => {
     }
   });
 }); // end of get history
+
+//history real
+app.post("/page-history-detail", async (req, res) => {
+  forex
+    .getPageDeal(req.body)
+    .then((deal) => {
+      if (deal) {
+        forex
+          .getPageHistory(req.body)
+          .then((history) => {
+            let temp = [];
+            let count = 0;
+
+            if (history) {
+              for (let i = 0; i < deal.length; i++) {
+                for (let j = 0; j < history.length; j++) {
+                  if (
+                    deal[i].PositionID === history[j].Order &&
+                    deal[i].Price !== history[j].PriceCurrent
+                  ) {
+                    count++;
+
+                    let change =
+                      (
+                        (history[j].Type === 1 ? -100 : 100) +
+                        100 * (history[j].PriceCurrent / deal[i].Price)
+                      )
+                        .toFixed(2)
+                        .toString() + " %";
+                    if (change === "200.00 %") {
+                      change = "0.00 %";
+                    } else if (
+                      (history[j].Type === 1 ? -100 : 100) +
+                        100 * (history[j].PriceCurrent / deal[i].Price) >
+                      100.0
+                    ) {
+                      change =
+                        (
+                          200 -
+                          ((history[j].Type === 1 ? -100 : 100) +
+                            100 * (history[j].PriceCurrent / deal[i].Price))
+                        )
+                          .toFixed(2)
+                          .toString() + " %";
+                    }
+                    temp.push({
+                      TimeSetup:
+                        new Date(Number(history[j].TimeSetup * 1000))
+                          .toISOString()
+                          .substr(0, 10) +
+                        " " +
+                        new Date(Number(history[j].TimeSetup * 1000))
+                          .toISOString()
+                          .substr(11, 8),
+                      Symbol: history[j].Symbol,
+                      Order: history[j].Order,
+                      Type: history[j].Type === 1 ? "Sell" : "Buy",
+                      Volume: history[j].VolumeInitial / 10000,
+                      PriceH: history[j].PriceCurrent,
+                      SL: history[j].PriceSL,
+                      TP: history[j].PriceTP,
+                      TimeDone:
+                        new Date(Number(deal[i].Time * 1000))
+                          .toISOString()
+                          .substr(0, 10) +
+                        " " +
+                        new Date(Number(deal[i].Time * 1000))
+                          .toISOString()
+                          .substr(11, 8),
+                      PriceD: deal[i].Price,
+                      Value: (
+                        (history[j].Type === 1 ? -10 : 10) *
+                        history[j].VolumeInitial *
+                        deal[i].Price
+                      ).toFixed(2),
+                      Commission: deal[i].Commission,
+                      Fee: deal[i].TickValue,
+                      Swap: deal[i].Storage,
+                      Profit: deal[i].Profit,
+                      Change: change,
+                    });
+                  }
+                }
+              }
+              return res.json({
+                data: temp,
+                status: 1,
+              });
+            } else {
+              return res
+                .status(404)
+                .json({ msg: "Ticket not found", status: 0 });
+            }
+          })
+          .catch(() => {
+            return res.status(404).json({ msg: "Forex Error", status: 0 });
+          });
+        //History mantığı
+      } else {
+        return res.status(404).json({ msg: "Ticket not found", status: 0 });
+      }
+    })
+    .catch(() => {
+      return res.status(404).json({ msg: "Forex Error", status: 0 });
+    });
+}); // end of get page history
 
 module.exports = app;
