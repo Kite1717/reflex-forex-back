@@ -114,8 +114,9 @@ app.post("/page-history-detail", async (req, res) => {
               for (let i = 0; i < deal.length; i++) {
                 for (let j = 0; j < history.length; j++) {
                   if (
-                    deal[i].PositionID === history[j].Order &&
-                    deal[i].Price !== history[j].PriceCurrent
+                    (deal[i].PositionID === history[j].Order &&
+                      deal[i].Price !== history[j].PriceCurrent) ||
+                    deal[i].Action === 3
                   ) {
                     count++;
 
@@ -186,6 +187,7 @@ app.post("/page-history-detail", async (req, res) => {
                         status: 1,
                       });
                     }
+                    break;
                   }
                 }
               }
