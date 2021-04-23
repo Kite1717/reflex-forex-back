@@ -190,11 +190,39 @@ app.post("/page-history-detail", async (req, res) => {
                   }
                 }
               }
+              if(req.body.LastFour)
+              {
+                let four = [];
 
-              return res.json({
-                data: temp,
-                status: 1,
-              });
+                temp.slice(-4).reverse().forEach((item)=>{
+                  four.push({
+                    ticket: item.Order,
+                    symbol : item.Symbol,
+                      opening_date: item.TimeSetup,
+                      closing_date: item.TimeDone,
+                      status: {
+                        name: item.Type,
+                        color: item.Type === "Buy" ? "info" :"danger"
+                      },
+                      profit: item.Profit,
+                      progress: {
+                        count: parseFloat(item.Change.split(" ")[0]),
+                        color: 'primary'
+                      }
+                  })
+                })
+                return res.json({
+                  data: four,
+                  status: 1,
+                });
+              }
+              else{
+                return res.json({
+                  data: temp,
+                  status: 1,
+                });
+              }
+             
             } else {
               return res
                 .status(404)
