@@ -252,7 +252,6 @@ app.post("/live-trading", async (req, res) => {
     if (deal) {
       let temp = [];
       let count = 0;
-      temp.push();
       for (let i = 0; i < deal.length; i++) {
         if (
           deal.filter((item) => item.PositionID === deal[i].PositionID)
@@ -294,6 +293,48 @@ app.post("/live-trading", async (req, res) => {
       return res.json({
         data: temp,
         status: 1,
+      });
+    } else {
+      return res.status(404).json({ msg: "Ticket not found", status: 0 });
+    }
+  });
+}); // end of get page history
+
+app.post("/popular-symbols", async (req, res) => {
+  forex.getPageDeal(req.body).then((deal) => {
+    if (deal) {
+      let dealTemp = deal;
+      let rateMap = {};
+      //pre process for deal
+      for (let i = 0; i < dealTemp.length; i++) {
+        if (
+          dealTemp.filter((item) => item.PositionID === dealTemp[i].PositionID)
+            .length > 1 ||
+          Number(dealTemp[i].Action) === 3 ||
+          Number(dealTemp[i].Action) === 2
+        ) {
+          dealTemp.splice(i, 1);
+        } else {
+        }
+      }
+
+      let count = dealTemp.length;
+
+      for (let i = 0; i < dealTemp.length; i++) {
+        if (
+          dealTemp[i].Symbol.toString() !== "" &&
+          rateMap[dealTemp[i].Symbol] === undefined
+        ) {
+          rateMap[dealTemp[i].Symbol] = 1;
+        } else if (dealTemp[i].Symbol.toString() !== "") {
+          rateMap[dealTemp[i].Symbol] = rateMap[dealTemp[i].Symbol] + 1;
+        }
+        if (dealTemp[i].Symbol.toString() === "") count--;
+      }
+      return res.json({
+        status: 1,
+        count,
+        data: rateMap,
       });
     } else {
       return res.status(404).json({ msg: "Ticket not found", status: 0 });
