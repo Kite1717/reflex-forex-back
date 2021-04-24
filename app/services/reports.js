@@ -100,6 +100,7 @@ app.get("/get-deal/:ticket", async (req, res) => {
 app.post("/page-history-detail", async (req, res) => {
   const total = req.body.Total;
   req.body.Total = 99999;
+  let totalProfit  = 0 ;
   forex
     .getPageDeal(req.body)
     .then((deal) => {
@@ -179,11 +180,13 @@ app.post("/page-history-detail", async (req, res) => {
                       Change: change,
                     });
 
+                    totalProfit +=deal[i].Profit;
                     //limit
                     if (count === total) {
                       return res.json({
                         data: temp,
                         status: 1,
+                        totalProfit,
                       });
                     }
                     break;
@@ -192,11 +195,11 @@ app.post("/page-history-detail", async (req, res) => {
               }
               if (req.body.LastFour) {
                 let four = [];
-
                 temp
                   .slice(-4)
                   .reverse()
                   .forEach((item) => {
+
                     four.push({
                       ticket: item.Order,
                       symbol: item.Symbol,
@@ -219,11 +222,13 @@ app.post("/page-history-detail", async (req, res) => {
                 return res.json({
                   data: four,
                   status: 1,
+                  totalProfit,
                 });
               } else {
                 return res.json({
                   data: temp,
                   status: 1,
+                  totalProfit,
                 });
               }
             } else {
