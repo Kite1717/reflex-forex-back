@@ -331,10 +331,22 @@ app.post("/popular-symbols", async (req, res) => {
         }
         if (dealTemp[i].Symbol.toString() === "") count--;
       }
+
+
+        let sortable = [];
+        for (let symbol in rateMap) {
+            sortable.push([symbol, rateMap[symbol]]);
+        }
+
+        
+        sortable.sort(function(a, b) {
+            return b[1]-  a[1] ;
+        });
+
       return res.json({
         status: 1,
         count,
-        data: rateMap,
+        data:sortable.slice(0,6),
       });
     } else {
       return res.status(404).json({ msg: "Ticket not found", status: 0 });
