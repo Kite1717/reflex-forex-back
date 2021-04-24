@@ -345,8 +345,8 @@ app.post("/popular-symbols", async (req, res) => {
 
       return res.json({
         status: 1,
-        count,
         data:sortable.slice(0,6),
+        count,
       });
     } else {
       return res.status(404).json({ msg: "Ticket not found", status: 0 });
