@@ -2,6 +2,10 @@ const express = require("express");
 const db = require("../models");
 const Op = db.Sequelize.Op;
 
+// YAPILACAAAAAAAAAAK
+// PROFİT + SWAP + COMMİSON   = TOTAL PROFİT
+
+
 // Middlewares
 const auth = require("../middlewares/auth");
 
